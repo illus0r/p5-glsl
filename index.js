@@ -1,6 +1,7 @@
 'use strict';
 let twgl = require('twgl.js')
 
+
 // setting up canvas
 var charCanvas = document.createElement('canvas');
 charCanvas.width = 512
@@ -10,6 +11,23 @@ charContext.fillStyle = "blue";
 charContext.fillRect(0, 0, charCanvas.width, charCanvas.height);
 charContext.fillStyle = "black";
 charContext.fillRect(100, 100, charCanvas.width - 200, charCanvas.height - 200);
+
+
+let sketch = function(p) {
+  let x = 100;
+  let y = 100;
+  p.setup = function() {
+    charCanvas = p.createCanvas(700, 410).elt;
+    charContext = charCanvas.getContext("2d");
+  };
+  p.draw = function() {
+    p.background(0);
+    p.fill(255);
+    p.rect(x, y, 50, 50);
+  };
+};
+let myp5 = new p5(sketch);
+
 
 const vShader = `#version 300 es
   precision mediump float;
@@ -26,13 +44,6 @@ const canvas = document.getElementById('gl');
 const gl = canvas.getContext('webgl2', { premultipliedAlpha: false });
 twgl.addExtensionsToContext(gl);
 
-let texture = twgl.createTexture(gl, {
-  src: charContext.canvas,
-  format: gl.RGB,
-  min: gl.LINEAR,
-  wrap: gl.CLAMP_TO_EDGE,
-})
-
 const program = twgl.createProgramInfo(gl, [vShader, fShader]);
 
 const positionObject = { position: { data: [1, 1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
@@ -42,6 +53,14 @@ let dt;
 let prevTime;
 
 function draw(time) {
+
+  let texture = twgl.createTexture(gl, {
+    src: charContext.canvas,
+    format: gl.RGB,
+    min: gl.LINEAR,
+    wrap: gl.CLAMP_TO_EDGE,
+  })
+  
   twgl.resizeCanvasToDisplaySize(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   dt = (prevTime) ? time - prevTime : 0;
